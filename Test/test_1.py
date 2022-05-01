@@ -8,16 +8,23 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 @pytest.fixture()
-def login_page():
+def get_browser():
     global driver
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     browser = driver
     url = 'http://localhost:8080/'
     browser.get(url)
 
+@pytest.fixture()
+def login_page(get_browser):
+    driver.find_element(By.XPATH, "//span[contains(.,'Log In')]").click()
+    assert driver.find_element(By.XPATH, "//div[@class='title'][contains(.,'Log In')]").text
+    assert driver.find_element(By.XPATH, "//input[@type='email']")
+    assert driver.find_element(By.XPATH, "//input[@type='password']")
+    assert driver.find_element(By.XPATH, "//button[contains(.,'LOG IN')]")
+
 
 def test_valid_login(login_page):
-    driver.find_element(By.XPATH, "//span[contains(.,'Log In')]").click()
     driver.find_element(By.XPATH, "//input[@type='email']").send_keys("admin")
     driver.find_element(By.XPATH, "//input[@type='password']").send_keys("admin")
     driver.find_element(By.XPATH, "//i[@id='togglePassword']").click()
